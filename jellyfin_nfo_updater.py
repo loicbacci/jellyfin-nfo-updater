@@ -11,16 +11,16 @@ parser = argparse.ArgumentParser(
     epilog="""
 examples:
   fix items where the NFO was written in the last 1 day:
-    python3 jellyfin_nfo_updater.py --library-paths /media/movies --path-mapping /media:/mnt/media --date 1 --datefile nfo
+    python3 jellyfin_nfo_updater.py --db-path /docker/jellyfin/config/data/jellyfin.db --library-paths /media/movies --path-mapping /media:/mnt/media --date 1 --datefile nfo
 
   fix items where the video was added in the last 7 days:
-    python3 jellyfin_nfo_updater.py --library-paths /media/tv --path-mapping /media:/mnt/media --date 7 --datefile mkv
+    python3 jellyfin_nfo_updater.py --db-path /docker/jellyfin/config/data/jellyfin.db --library-paths /media/tv --path-mapping /media:/mnt/media --date 7 --datefile mkv
 
   fix all items regardless of date:
-    python3 jellyfin_nfo_updater.py --library-paths /media/movies --path-mapping /media:/mnt/media
+    python3 jellyfin_nfo_updater.py --db-path /docker/jellyfin/config/data/jellyfin.db --library-paths /media/movies --path-mapping /media:/mnt/media
 
   fix all items with dry run:
-    python3 jellyfin_nfo_updater.py --library-paths /media/movies --path-mapping /media:/mnt/media --dry-run
+    python3 jellyfin_nfo_updater.py --db-path /docker/jellyfin/config/data/jellyfin.db --library-paths /media/movies --path-mapping /media:/mnt/media --dry-run
 
 notes:
   - stop Jellyfin before running this script
@@ -50,13 +50,12 @@ parser.add_argument(
 )
 parser.add_argument(
     '--backup-dir',
-    default='/var/lib/jellyfin/backups',
-    help='directory to store database backups (default: /var/lib/jellyfin/backups)'
+    help='directory to store database backups (defaults to same directory as database)'
 )
 parser.add_argument(
     '--db-path',
-    default='/var/lib/jellyfin/data/jellyfin.db',
-    help='path to Jellyfin database (default: /var/lib/jellyfin/data/jellyfin.db)'
+    required=True,
+    help='path to Jellyfin database'
 )
 parser.add_argument(
     '--library-paths',
@@ -103,7 +102,7 @@ if not os.path.exists(db_path):
     print(f"Error: Database not found at {db_path}")
     exit(1)
 
-backup_dir = args.backup_dir
+backup_dir = args.backup_dir or os.path.dirname(db_path)
 os.makedirs(backup_dir, exist_ok=True)
 
 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')

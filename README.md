@@ -32,7 +32,7 @@ This script is based on the original work by [garlandkr](https://gist.github.com
 ### Basic Usage
 
 ```bash
-python3 jellyfin_nfo_updater.py --library-paths /media/movies
+python3 jellyfin_nfo_updater.py --db-path /path/to/jellyfin.db --library-paths /media/movies
 ```
 
 ### With Path Mapping (Docker/Container Environments)
@@ -41,6 +41,7 @@ If Jellyfin runs in a container and uses different paths than your host system:
 
 ```bash
 python3 jellyfin_nfo_updater.py \
+  --db-path /docker/jellyfin/config/data/jellyfin.db \
   --library-paths /media/movies /media/tv \
   --path-mapping /media:/mnt/media
 ```
@@ -51,6 +52,7 @@ See what would be updated without making changes:
 
 ```bash
 python3 jellyfin_nfo_updater.py \
+  --db-path /docker/jellyfin/config/data/jellyfin.db \
   --library-paths /media/movies \
   --path-mapping /media:/mnt/media \
   --dry-run
@@ -62,26 +64,27 @@ Update only items modified in the last 7 days:
 
 ```bash
 python3 jellyfin_nfo_updater.py \
+  --db-path /docker/jellyfin/config/data/jellyfin.db \
   --library-paths /media/movies \
   --path-mapping /media:/mnt/media \
   --date 7
 ```
 
-### Custom Database Path
+### Custom Backup Directory
 
 ```bash
 python3 jellyfin_nfo_updater.py \
+  --db-path /docker/jellyfin/config/data/jellyfin.db \
   --library-paths /media/movies \
-  --db-path /custom/path/to/jellyfin.db \
   --backup-dir /custom/backup/dir
 ```
 
 ## Arguments
 
+- `--db-path` (required): Path to Jellyfin database file
 - `--library-paths` (required): Library paths as seen by Jellyfin (space-separated for multiple)
 - `--path-mapping`: Map container paths to host paths (format: `container_path:host_path`)
-- `--db-path`: Path to Jellyfin database (default: `/var/lib/jellyfin/data/jellyfin.db`)
-- `--backup-dir`: Directory for database backups (default: `/var/lib/jellyfin/backups`)
+- `--backup-dir`: Directory for database backups (defaults to same directory as database)
 - `--date`: Age filter in days or "all" (default: `all`)
 - `--datefile`: File type for date comparison: `mkv`, `nfo`, `mp4`, or `all` (default: `nfo`)
 - `--dry-run`: Show changes without updating database
@@ -111,6 +114,7 @@ The script updates the following fields in Jellyfin's database:
 2. Run the script with dry-run first:
    ```bash
    python3 jellyfin_nfo_updater.py \
+     --db-path /docker/jellyfin/config/data/jellyfin.db \
      --library-paths /media/movies \
      --path-mapping /media:/mnt/media \
      --dry-run
@@ -118,6 +122,7 @@ The script updates the following fields in Jellyfin's database:
 3. If satisfied, run without dry-run:
    ```bash
    python3 jellyfin_nfo_updater.py \
+     --db-path /docker/jellyfin/config/data/jellyfin.db \
      --library-paths /media/movies \
      --path-mapping /media:/mnt/media
    ```
